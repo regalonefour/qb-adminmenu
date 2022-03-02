@@ -1153,11 +1153,19 @@ CreateThread(function()	-- While loop needed for delete lazer
 			Draw2DText(Lang:t("info.delete_object_info"), 4, {255, 255, 255}, 0.4, 0.55, 0.888 + 0.025)
 			-- When E pressed then remove targeted entity
 			if IsControlJustReleased(0, 38) then
-			    -- Set as missionEntity so the object can be remove (Even map objects)
-			    SetEntityAsMissionEntity(entity, true, true)
-			    --SetEntityAsNoLongerNeeded(entity)
-			    --RequestNetworkControl(entity)
-			    DeleteEntity(entity)
+				if IsEntityAVehicle(entity) then
+				    NetworkRequestControlOfEntity(entity)
+				    SetEntityAsMissionEntity(entity, true, true)
+				    DeleteVehicle(entity)
+				    CreateThread(function()
+					Wait(300)
+						SetEntityAsMissionEntity(entity, true, true)
+						DeleteEntity(entity)                        
+				    end)
+				else
+				    SetEntityAsMissionEntity(entity, true, true)
+				    DeleteEntity(entity)
+				end
 			end
 		    -- Only draw of not center of map
 		    elseif coords.x ~= 0.0 and coords.y ~= 0.0 then
